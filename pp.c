@@ -46,9 +46,18 @@ void main() {
     for(int i = 0; i < n; i++) {
         arr[i] = rand()%100;
     }
-    //print unsorted array
+    
+    printf("Unsorted :\n");
+    for(int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+    print("\n\n\n");
+        
     mergesort(arr,0,n-1);
-    //print sorted array
+    
+    printf("Sorted :\n");
+    for(int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+    print("\n\n\n");
 }
 
 #include<stdio.h>
@@ -65,15 +74,20 @@ void main() {
 
     int matrix[rows][cols], vector[size], result[rows];
 
+    printf("Matrix is :\n");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             matrix[i][j] = i+j;
+            printf("%d ", (i+j));
         }
+        printf("\n");
         result[i] = 0;
     }
 
+    printf("Vector is :\n");
     for (int i = 0; i < size; i++) {
         vector[i] = i;
+        printf("%d ", i);
     }
 
     #pragma omp parallel for private(j) {
@@ -84,7 +98,11 @@ void main() {
         }
     }
 
-    //print result
+    printf("\nResult is :\n");
+    for (int i = 0; i < rows; i++) {
+        printf("%d ", result[i]);
+    }
+        
 }
 
 #include<stdio.h>
@@ -123,13 +141,20 @@ void main() {
     scanf("%d",&max);
     #pragma omp parallel sections {
         #pragma omp section {
-            findPrime(max)
+            findPrime(max);
+            for(int i = 0; i < max; i++) {
+                printf("Prime no at index %d is %lf", i, primes[i]);
+            }
+             
         }
         #pragma omp section {
-            findSines(max)
+            findSines(max);
+            for(int i = 0; i < max; i++) {
+                printf("Sine no at index %d is %lf", i, sines[i]);
+            }
         }
     }
-    //Print both tables
+    
 }
 
 #include<stdio.h>
@@ -146,7 +171,7 @@ void main() {
             fact1 *= i;
         }
     }
-    printf("%d",fact1);
+    printf("\nFactorial without firstprivate %d\n",fact1);
     
     //wihtout firstprivate
     #pragma omp parallel for firstprivate(a,fact2) {
@@ -154,7 +179,7 @@ void main() {
             fact2 *= i;
         }
     }
-    printf("%d",fact2)
+    printf("\nFactorial with firstprivate %d\n",fact2)
 }
 
 
@@ -210,7 +235,9 @@ void main() {
     double t1 = omp_get_wtime();
     classify(max);
     double t2 = omp_get_wtime();
-    //print clustercount and t2-t1
+    printf("\nCluster Counts\n");
+    for(int i = 0; i < max; i++)
+        printf("%d index has %d points\n", i, clusterCount[i]);
 }
 
 ==============================
@@ -240,7 +267,7 @@ void main(int argc, char* argv[]) {
     }
     else {
         MPI_Recv(msg, BUFFER, MPI_CHAR, root, 0, MPI_COMM_WORLD, &status);
-        printf("%s at %d from %d", msg, rank, root);
+        printf("\nmsg %s at processor %d from processor %d\n", msg, rank, root);
     }
     MPI_Finalize();
 }
@@ -259,7 +286,7 @@ void main(int argc, char* argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     if (rank == 0) {
-        printf("starting with %d proc",size);
+        printf("\nstarting with %d proc\n",size);
     }
 
     for(i = 0; i < 100; i++) {
@@ -272,11 +299,11 @@ void main(int argc, char* argv[]) {
     for(int i = 0; i < 100; i++) {
         mysum += a[i]*b[i];
     }
-    printf("%d %d",rank,mysum);
+    printf("\nprocessor %d's sum is %d\n",rank,mysum);
     MPI_Reduce(&mysum,&allsum,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 
     if (rank == 0) {
-        printf("%d", allsum);
+        printf("\nAllsum is %d\n", allsum);
     }
     MPI_Finalize();
 }
@@ -300,7 +327,7 @@ void main(int argc, char*argv[]) {
     for(int i = 0; i < N; i++) {
         double x = (double)rand()/RAND_MAX;
         double y = (double)rand()/RAND_MAX;
-        z = x*x+y&y;
+        z = x*x+y*y;
         if (z < 1) {
             count++;
         }
@@ -308,7 +335,7 @@ void main(int argc, char*argv[]) {
     MPI_Reduce(&count,&final,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 
     if (rank == 0) {
-        printf("%ld", 4*final/N);
+        printf("\nPI value is %ld\n", final/N);
     }
     MPI_Finalize();
 }
@@ -346,14 +373,14 @@ void main(int argc, char* argv[]) {
     }
     else {
         oddp = rank;
-        MPI_Reduce(&oddp,&oddtotal,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+        MPI_Reduce(&oddp,&oddtotal,1,MPI_DOUBLE,MPI_SUM,1,MPI_COMM_WORLD);
     }
 
     if (rank == 0) {
-        printf("%d",eventotal);
+        printf("\nEven total is %d\n",eventotal);
     }
     else if (rank == 1) {
-        printf("%d",oddtotal);
+        printf("\nOdd total is %d\n",oddtotal);
     }
     MPI_Finalize();
 }
@@ -389,7 +416,13 @@ void main(int argc, char* argv[]) {
     }
     else if (rank == 1) {
         MPI_Recv(&c,BUFFER,MPI_INT,0,0,MPI_COMM_WORLD,&status);
-        //print array
+        printf("\nResult is : \n");
+        for(int i = 0; i < 2; i++) {
+            for(int j = 0; j < 2; j++) {
+                printf("%d ", c[i][j]);
+            }
+            printf("\n");
+        }
     }
     MPI_Finalize();
 }
